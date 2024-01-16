@@ -1,0 +1,37 @@
+version: "3.8"
+services:
+  webclient:
+    image: node:20-alpine
+    volumes:
+      - './webclient:/usr/src/webclient'
+    ports:
+      - 4200:4200
+    working_dir: /usr/src/webclient
+    command: sh -c "npm install -g @angular/cli && ng serve --host 0.0.0.0 --port 4200"
+  server:
+    image: node:20-alpine
+    volumes:
+      - './server:/usr/src/server'
+    ports:
+      - 3000:3000
+    working_dir: /usr/src/server
+    command: sh -c "npm install && npm run start:dev"
+  postgres:
+    image: postgres:16.1-alpine
+    ports:
+      - 5432:5432
+    volumes:
+      - ./postgres:/var/lib/postgresql
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+  mongodb:
+    image: mongodb/mongodb-community-server:${MONGODB_VERSION}
+    ports:
+      - 27017:27017
+    volumes:
+      - ./data:/data/mongodb/mongodb-community-server
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
