@@ -28,7 +28,7 @@ The project was developed usign Ubuntu as host operating system, and shipped wit
 
 To contribute to the project please observe the rules listed below:
 - TDD is **mandatory** for backend
-- TDD is **mandatory** for frontend
+- TDD is **optional** for frontend
 - Semmantic commits is mandatory for any change in project
 - Create a pull request
 
