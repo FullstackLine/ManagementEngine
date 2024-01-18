@@ -10,95 +10,265 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
+//FEATURE: USER MANAGEMENT
+model SystemUser {
   @@map("system_users")
-  id                  Int     @default(autoincrement()) @id
-  email               String  @unique
+  id                  Int               @default(autoincrement()) @id
+  email               String            @unique
   password            String
   public_name         String
-  user_status         UserStatus @relation(fields: [user_status_id], references: [id])
+  full_name           String
+  tasks               UserTask[]
+  roles               SystemUserExternIntegration[]
+  files               File[]
+  persons             Person[]
+  data_visualizers    DataVisualizer[]
+  events              SystemEventTracking[]
+  user_status         SystemUserStatus  @relation(fields: [user_status_id], references: [id])
   user_status_id      Int
-  created_at          DateTime
-  updated_at          DateTime
+  created_at          DateTime          @default(now())
+  updated_at          DateTime          @updatedAt
   deleted_at          DateTime
 }
 
-model UserStatus {
+model SystemUserStatus {
   @@map("system_users_status")
-  id                  Int     @default(autoincrement()) @id
-  user                User[]
-  title               String
+  id                  Int         @default(autoincrement()) @id
+  user                SystemUser[]
+  name                String
   description         String
+  created_at          DateTime    @default(now())
+  updated_at          DateTime    @updatedAt
+  deleted_at          DateTime
 }
+//END: USER MANAGEMENT
 
-model UserExternIntegration {
+//FEATURE: SYSTEM USERS EXTERN INTEGRATION MANAGEMENT
+model SystemUserExternIntegration {
   @@map("system_users_extern_integration")
-  id                  Int     @default(autoincrement()) @id
-  title               String
-  description         String
+  id                  Int         @default(autoincrement()) @id
+  user                SystemUser  @relation(fields: [user_id], references: [id])
+  user_id             Int     
+  extern_code         String      @db.Text
+  tag                 SystemUserExternIntegrationTags @relation(fields: [tag_id], references: [id])
+  tag_id              Int
+  created_at          DateTime    @default(now())
+  updated_at          DateTime    @updatedAt
+  deleted_at          DateTime
 }
 
-model Role {
+model SystemUserExternIntegrationTags {
+  @@map("system_users_extern_integration_tags")
+  id                  Int         @default(autoincrement()) @id
+  user                SystemUserExternIntegration[]
+  name                String
+  description         String      @db.Text
+  created_at          DateTime    @default(now())
+  updated_at          DateTime    @updatedAt
+  deleted_at          DateTime
+}
+//END: SYSTEM EXTERN INTEGRATION MANAGEMENT
+
+
+//FEATURE: SYSTEM ROLES AND PERMISSIONS MANAGEMENT
+model SystemRole {
   @@map("system_roles")
-  id                  Int     @default(autoincrement()) @id
+  id                  Int         @default(autoincrement()) @id
+  name                String
+  description         String      @db.Text
+  created_at          DateTime    @default(now())
+  updated_at          DateTime    @updatedAt
+  deleted_at          DateTime
 }
 
-model Permission {
-  @@map("system_permissions")
-  id                  Int     @default(autoincrement()) @id
-}
-
-model RolePermission {
+model SystemRolePermission {
   @@map("system_roles_permissions")
-  id                  Int     @default(autoincrement()) @id
+  id                  Int         @default(autoincrement()) @id
+  created_at          DateTime    @default(now())
+  updated_at          DateTime    @updatedAt
+  deleted_at          DateTime
 }
 
-model UserRole {
+model SystemUserPermission {
+  @@map("system_users_permissions")
+  id                  Int         @default(autoincrement()) @id
+  created_at          DateTime    @default(now())
+  updated_at          DateTime    @updatedAt
+  deleted_at          DateTime
+}
+
+model SystemUserRole {
   @@map("system_users_roles")
-  id                  Int     @default(autoincrement()) @id
+  id                  Int         @default(autoincrement()) @id
+  created_at          DateTime    @default(now())
+  updated_at          DateTime    @updatedAt
+  deleted_at          DateTime
+}
+//END: SYSTEM ROLES AND PERMISSIONS MANAGEMENT
+
+
+//FEATURE: SYSTEM EVENTS TRACKING MANAGEMENT
+model SystemUserTracking {
+  @@map("system_users_events_tracking")
+  id                  Int         @default(autoincrement()) @id
+  created_at          DateTime    @default(now())
+  updated_at          DateTime    @updatedAt
+  deleted_at          DateTime
 }
 
-model UserTracking {
-  @@map("system_users_tracking")
-  id                  Int     @default(autoincrement()) @id
-}
 
-model EventTracking {
+model SystemEventTracking {
   @@map("system_events_tracking")
-  id                  Int     @default(autoincrement()) @id
+  id                  Int                       @default(autoincrement()) @id
+  user_id             Int
+  event_type_id       Int
+  user                SystemUser                @relation(fields: [user_id], references: [id])
+  event               SystemEventTypesTracking  @relation(fields: [event_type_id], references: [id])
+  created_at          DateTime                  @default(now())
+  updated_at          DateTime                  @updatedAt
+  deleted_at          DateTime
 }
 
+model SystemEventTypesTracking {
+  @@map("system_events_types_tracking")
+  id                  Int         @default(autoincrement()) @id
+  name                String
+  description         String      @db.Text
+  events              SystemEventTracking[]
+  created_at          DateTime    @default(now())
+  updated_at          DateTime    @updatedAt
+  deleted_at          DateTime
+}
+//END: SYSTEM EVENTS TRACKING MANAGEMENT
+
+
+//FEATURE: SYSTEM SETTINGS
 model SystemSettings {
   @@map("system_settings")
   id                  Int     @default(autoincrement()) @id
+  feature             String
+  flag                Int
+  rules_in_json       String      @db.Text
+  created_at          DateTime    @default(now())
+  updated_at          DateTime    @updatedAt
+  deleted_at          DateTime
 }
+//END: SYSTEM SETTINGS
 
+
+//FEATURE: PEOPLE MANAGEMENT
 model Person {
   @@map("fpm_persons")
-  id                  Int     @default(autoincrement()) @id
+  id                  Int                   @default(autoincrement()) @id
+  user                SystemUser            @relation(fields: [user_id], references: [id])
+  user_id             Int
+  departments         PersonDepartment[]
+  occupations         PersonOccupation[]
+  created_at          DateTime              @default(now())
+  updated_at          DateTime              @updatedAt
+  deleted_at          DateTime
+}
+
+model Occupation {
+  @@map("fpm_occupations")
+  id                  Int                 @default(autoincrement()) @id
+  occupations         PersonOccupation[]  
+  created_at          DateTime            @default(now())
+  updated_at          DateTime            @updatedAt
+  deleted_at          DateTime
+}
+
+model PersonOccupation {
+  @@map("fpm_persons_occupations")
+  id                  Int         @default(autoincrement()) @id
+  person              Person      @relation(fields: [person_id], references: [id])
+  occupation          Occupation  @relation(fields: [occupation_id], references: [id])
+  person_id           Int
+  occupation_id       Int
+  created_at          DateTime    @default(now())
+  updated_at          DateTime    @updatedAt
+  deleted_at          DateTime
+}
+
+model PersonDepartment {
+  @@map("fpm_persons_departments")
+  id                  Int         @default(autoincrement()) @id
+  person              Person      @relation(fields: [person_id], references: [id])
+  department          Department  @relation(fields: [department_id], references: [id])
+  person_id           Int
+  department_id       Int
+  created_at          DateTime    @default(now())
+  updated_at          DateTime    @updatedAt
+  deleted_at          DateTime
 }
 
 model Department {
   @@map("fpm_departments")
-  id                  Int     @default(autoincrement()) @id
+  id                  Int         @default(autoincrement()) @id
+  name                String
+  description         String      @db.Text
+  persons             PersonDepartment[]
+  created_at          DateTime    @default(now())
+  updated_at          DateTime    @updatedAt
+  deleted_at          DateTime
 }
+//END: PEOPLE MANAGEMENT
 
+//FEATURE: FILE MANAGEMENT
 model File {
   @@map("ffm_files")
-  id                  Int     @default(autoincrement()) @id
+  id                  Int         @default(autoincrement()) @id
+  hash                String      @db.Text
+  file_name           String      @db.Text
+  file_path           String      @db.Text
+  file_mimetype       String      @db.Text
+  file_size_bytes     Int
+  description         String      @db.Text
+  user                SystemUser  @relation(fields: [user_id], references: [id])
+  user_id             Int
+  created_at          DateTime    @default(now())
+  updated_at          DateTime    @updatedAt
+  deleted_at          DateTime
 }
+//END: FILE MANAGEMENT
 
+//FEATURE: DATA VISUALIZER MANAGEMENT
 model DataVisualizer {
   @@map("fdv_data_visualizers")
-  id                  Int     @default(autoincrement()) @id
+  id                  Int         @default(autoincrement()) @id
+  name                String
+  description         String      @db.Text
+  user                SystemUser  @relation(fields: [user_id], references: [id])
+  user_id             Int
+  rules_in_json       String      @db.Text
+  created_at          DateTime    @default(now())
+  updated_at          DateTime    @updatedAt
+  deleted_at          DateTime
 }
+//END: DATA VISUALIZER MANAGEMENT
 
+//FEATURE: TASK MANAGEMENT
 model Task {
   @@map("ftm_tasks")
-  id                  Int     @default(autoincrement()) @id
+  id                  Int         @default(autoincrement()) @id
+  title               String
+  description         String      @db.Text
+  deadline_at         DateTime
+  users               UserTask[]
+  created_at          DateTime    @default(now())
+  updated_at          DateTime    @updatedAt
+  deleted_at          DateTime
 }
 
 model UserTask {
   @@map("ftm_users_tasks")
-  id                  Int     @default(autoincrement()) @id
+  id                  Int         @default(autoincrement()) @id
+  task                Task        @relation(fields: [task_id], references: [id])
+  task_id             Int
+  user                SystemUser  @relation(fields: [user_id], references: [id])
+  user_id             Int
+  created_at          DateTime    @default(now())
+  updated_at          DateTime    @updatedAt
+  deleted_at          DateTime
 }
+//END: TASK MANAGEMENT
