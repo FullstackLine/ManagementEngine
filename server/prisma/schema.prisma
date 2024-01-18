@@ -1,0 +1,104 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  @@map("system_users")
+  id                  Int     @default(autoincrement()) @id
+  email               String  @unique
+  password            String
+  public_name         String
+  user_status         UserStatus @relation(fields: [user_status_id], references: [id])
+  user_status_id      Int
+  created_at          DateTime
+  updated_at          DateTime
+  deleted_at          DateTime
+}
+
+model UserStatus {
+  @@map("system_users_status")
+  id                  Int     @default(autoincrement()) @id
+  user                User[]
+  title               String
+  description         String
+}
+
+model UserExternIntegration {
+  @@map("system_users_extern_integration")
+  id                  Int     @default(autoincrement()) @id
+  title               String
+  description         String
+}
+
+model Role {
+  @@map("system_roles")
+  id                  Int     @default(autoincrement()) @id
+}
+
+model Permission {
+  @@map("system_permissions")
+  id                  Int     @default(autoincrement()) @id
+}
+
+model RolePermission {
+  @@map("system_roles_permissions")
+  id                  Int     @default(autoincrement()) @id
+}
+
+model UserRole {
+  @@map("system_users_roles")
+  id                  Int     @default(autoincrement()) @id
+}
+
+model UserTracking {
+  @@map("system_users_tracking")
+  id                  Int     @default(autoincrement()) @id
+}
+
+model EventTracking {
+  @@map("system_events_tracking")
+  id                  Int     @default(autoincrement()) @id
+}
+
+model SystemSettings {
+  @@map("system_settings")
+  id                  Int     @default(autoincrement()) @id
+}
+
+model Person {
+  @@map("fpm_persons")
+  id                  Int     @default(autoincrement()) @id
+}
+
+model Department {
+  @@map("fpm_departments")
+  id                  Int     @default(autoincrement()) @id
+}
+
+model File {
+  @@map("ffm_files")
+  id                  Int     @default(autoincrement()) @id
+}
+
+model DataVisualizer {
+  @@map("fdv_data_visualizers")
+  id                  Int     @default(autoincrement()) @id
+}
+
+model Task {
+  @@map("ftm_tasks")
+  id                  Int     @default(autoincrement()) @id
+}
+
+model UserTask {
+  @@map("ftm_users_tasks")
+  id                  Int     @default(autoincrement()) @id
+}
