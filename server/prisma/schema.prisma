@@ -18,14 +18,14 @@ model SystemUser {
   password            String
   public_name         String
   full_name           String
+  user_status_id      Int
+  user_status         SystemUserStatus  @relation(fields: [user_status_id], references: [id])
   tasks               UserTask[]
   roles               SystemUserExternIntegration[]
   files               File[]
   persons             Person[]
   data_visualizers    DataVisualizer[]
   events              SystemEventTracking[]
-  user_status         SystemUserStatus  @relation(fields: [user_status_id], references: [id])
-  user_status_id      Int
   created_at          DateTime          @default(now())
   updated_at          DateTime          @updatedAt
   deleted_at          DateTime
@@ -34,9 +34,9 @@ model SystemUser {
 model SystemUserStatus {
   @@map("system_users_status")
   id                  Int         @default(autoincrement()) @id
-  user                SystemUser[]
   name                String
   description         String
+  user                SystemUser[]
   created_at          DateTime    @default(now())
   updated_at          DateTime    @updatedAt
   deleted_at          DateTime
@@ -47,11 +47,11 @@ model SystemUserStatus {
 model SystemUserExternIntegration {
   @@map("system_users_extern_integration")
   id                  Int         @default(autoincrement()) @id
-  user                SystemUser  @relation(fields: [user_id], references: [id])
   user_id             Int     
   extern_code         String      @db.Text
-  tag                 SystemUserExternIntegrationTags @relation(fields: [tag_id], references: [id])
   tag_id              Int
+  user                SystemUser  @relation(fields: [user_id], references: [id])
+  tag                 SystemUserExternIntegrationTags @relation(fields: [tag_id], references: [id])
   created_at          DateTime    @default(now())
   updated_at          DateTime    @updatedAt
   deleted_at          DateTime
@@ -60,9 +60,9 @@ model SystemUserExternIntegration {
 model SystemUserExternIntegrationTags {
   @@map("system_users_extern_integration_tags")
   id                  Int         @default(autoincrement()) @id
-  user                SystemUserExternIntegration[]
   name                String
   description         String      @db.Text
+  user                SystemUserExternIntegration[]
   created_at          DateTime    @default(now())
   updated_at          DateTime    @updatedAt
   deleted_at          DateTime
@@ -76,6 +76,7 @@ model SystemRole {
   id                  Int         @default(autoincrement()) @id
   name                String
   description         String      @db.Text
+  roles               SystemRolePermission[]
   created_at          DateTime    @default(now())
   updated_at          DateTime    @updatedAt
   deleted_at          DateTime
@@ -83,7 +84,28 @@ model SystemRole {
 
 model SystemRolePermission {
   @@map("system_roles_permissions")
+  id                  Int                   @default(autoincrement()) @id
+  role                SystemRole            @relation(fields: [role_id], references: [id])
+  permission          SystemPermissions  @relation(fields: [permission_id], references: [id])
+  role_id             Int
+  permission_id       Int
+  created_at          DateTime              @default(now())
+  updated_at          DateTime              @updatedAt
+  deleted_at          DateTime
+}
+
+model SystemPermissions {
+  @@map("system_permissions")
   id                  Int         @default(autoincrement()) @id
+  roles               SystemRolePermission[]
+  feature             String
+  tag                 String
+  read                Boolean
+  write               Boolean
+  edit                Boolean
+  soft_delete         Boolean
+  hard_delete         Boolean
+  admin               Boolean
   created_at          DateTime    @default(now())
   updated_at          DateTime    @updatedAt
   deleted_at          DateTime
@@ -153,6 +175,31 @@ model SystemSettings {
   updated_at          DateTime    @updatedAt
   deleted_at          DateTime
 }
+
+model SystemFeatures {
+  @@map("system_features")
+  id                  Int     @default(autoincrement()) @id
+  name                String
+  description         String      @db.Text
+  tags                SystemTags[]
+  created_at          DateTime    @default(now())
+  updated_at          DateTime    @updatedAt
+  deleted_at          DateTime
+}
+
+model SystemTags {
+  @@map("system_tags")
+  id                  Int     @default(autoincrement()) @id
+  name                String
+  description         String      @db.Text
+  feature             SystemFeatures    @relation(fields: [feature_id], references: [id])
+  feature_id          Int
+  created_at          DateTime    @default(now())
+  updated_at          DateTime    @updatedAt
+  deleted_at          DateTime
+}
+
+
 //END: SYSTEM SETTINGS
 
 
@@ -160,8 +207,8 @@ model SystemSettings {
 model Person {
   @@map("fpm_persons")
   id                  Int                   @default(autoincrement()) @id
-  user                SystemUser            @relation(fields: [user_id], references: [id])
   user_id             Int
+  user                SystemUser            @relation(fields: [user_id], references: [id])
   departments         PersonDepartment[]
   occupations         PersonOccupation[]
   created_at          DateTime              @default(now())
