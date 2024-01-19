@@ -4,8 +4,8 @@
   "sourceRoot": "src",
   "compilerOptions": {
     "deleteOutDir": true,
-    "assets": [{
-      "include": "i18n/**/*", "watchAssets": true, "outDir": "dist/apps/api"
-    }]
+    "assets": [
+      { "include": "i18n/**/*", "watchAssets": true, "outDir": "dist/src" }
+    ]
   }
 }
