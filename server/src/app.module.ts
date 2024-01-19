@@ -3,6 +3,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { PrismaService } from './prisma.service';
 import {I18nModule} from 'nestjs-i18n';
+import { SystemUserModule } from './system-user/system-user.module';
 import * as path from 'path';
 
 
@@ -14,7 +15,7 @@ console.log(path.join(__dirname, '/i18n/'))
       path: path.join(__dirname, '/i18n/'),
       watch: true,
     },
-  })],
+  }), SystemUserModule],
   controllers: [AppController],
   providers: [AppService, PrismaService],
 })
