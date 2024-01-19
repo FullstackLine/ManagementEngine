@@ -7,11 +7,11 @@ import { PrismaService } from './prisma.service';
 export class AppService {
   constructor(private prisma: PrismaService){}
 
-  async getHello() {
-    return await this.prisma.systemUser.findUnique({
-      where: {
-        id: 1
-      }
-    })
+  async getHello(id: number){
+    //return 1;
+    const r = this.prisma.systemUser.findMany();
+    console.log(r);
+    return r;
+
   }
 }
