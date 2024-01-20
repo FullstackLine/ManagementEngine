@@ -72,7 +72,7 @@ async function main(){
         prisma.systemEventTypesTracking.upsert({where: {id: 5}, create:{id: 5, name: "data_hard_deleted", description: "Hard deleted data in the system."}, update: {}}),
     ]);
 
-    //Uncommend and use if you need to seed more inforation for core tables.
+    //Uncomment and use if you need to seed more inforation for core tables.
     //const seed_system_users = await prisma.$transaction([]);
     //const seed_system_users_roles = await prisma.$transaction([]);
     //const seed_system_users_extern_integration = await prisma.$transaction([]);
