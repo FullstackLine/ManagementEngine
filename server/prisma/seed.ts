@@ -2,17 +2,96 @@ import {PrismaClient} from "@prisma/client";
 const prisma = new PrismaClient();
 
 async function main(){
+    
 
-    const timestamp = Date.now();
+    const seed_system_users_status =  await prisma.$transaction([
+        prisma.systemUserStatus.upsert({
+            where: {
+                id: 1
+            },
+            create: {
+                id:1, name: "awaiting", description: "Awaiting email confirmation."
+            },
+            update: {}
+        }),
+        prisma.systemUserStatus.upsert({
+            where: {
+                id: 2
+            },
+            create: {
+                id:2, name: "confirmed", description: "After email confirmation."
+            },
+            update: {}
+        })
+    ]);
 
-    const system_features = [
-        {}
-    ];
-    const system_users_status = [];
-    const system_roles = [];
-    const system_events_types_tracking = [];
-    const system_users_roles = [];
-    const system_users = [];
+    const seed_system_roles = await prisma.$transaction([
+        prisma.systemRole.upsert({
+            where: {
+                id: 1
+            },
+            create: {
+                id: 1,
+                name: "root",
+                description: "The root role is the super admin system with all permissions.",
+            },
+            update: {}
+        }),
+        prisma.systemRole.upsert({
+            where: {
+                id: 2
+            },
+            create: {
+                id: 2,
+                name: "admin",
+                description: "The admin role doesn't have the permission to remove or change permissions of root, but have all others permissions like as root.",
+            },
+            update: {}
+        }),
+        prisma.systemRole.upsert({
+            where: {
+                id: 3
+            },
+            create: {
+                id: 3,
+            name: "basic",
+            description: "The basic role has only permission to do login and wait for more permissions gived from root or admin.",
+            },
+            update: {}
+        })
+    ]);
+
+
+
+    
+    const seed_system_events_types_tracking = await prisma.$transaction([
+        prisma.systemEventTypesTracking.upsert({where: {id: 1}, create:{id: 1, name: "user_session_start", description: "Logged in the system."}, update: {}}),
+        prisma.systemEventTypesTracking.upsert({where: {id: 2}, create:{id: 2, name: "data_inserted", description: "Inserted new data in the system."}, update: {}}),
+        prisma.systemEventTypesTracking.upsert({where: {id: 3}, create:{id: 3, name: "data_updated", description: "Updated data in the system."}, update: {}}),
+        prisma.systemEventTypesTracking.upsert({where: {id: 4}, create:{id: 4, name: "data_soft_deleted", description: "Soft deleted data in the system."}, update: {}}),
+        prisma.systemEventTypesTracking.upsert({where: {id: 5}, create:{id: 5, name: "data_hard_deleted", description: "Hard deleted data in the system."}, update: {}}),
+    ]);
+
+    const seed_system_users = [];
+    const seed_system_users_roles = [];
+    const seed_system_users_extern_integration = [];
+    const seed_system_users_extern_integration_tags = [];
+    const seed_system_permissions = [];
+    const seed_system_roles_permissions = [];
+    const seed_system_users_permissions = [];
+    const seed_system_users_events_tracking = [];
+    const seed_system_settings = [];
+    const seed_system_features = [];
+    const seed_system_tags = [];
+    const seed_fpm_persons = [];
+    const seed_fpm_occupations = [];
+    const seed_fpm_persons_occupations = [];
+    const seed_fpm_persons_departments = [];
+    const seed_fpm_departments = [];
+    const seed_ffm_files = [];
+    const seed_fdv_data_visualizers = [];
+    const seed_ftm_tasks = [];
+    const seed_ftm_users_tasks = [];
 
 }
 
