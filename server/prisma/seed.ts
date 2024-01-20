@@ -72,26 +72,27 @@ async function main(){
         prisma.systemEventTypesTracking.upsert({where: {id: 5}, create:{id: 5, name: "data_hard_deleted", description: "Hard deleted data in the system."}, update: {}}),
     ]);
 
-    const seed_system_users = [];
-    const seed_system_users_roles = [];
-    const seed_system_users_extern_integration = [];
-    const seed_system_users_extern_integration_tags = [];
-    const seed_system_permissions = [];
-    const seed_system_roles_permissions = [];
-    const seed_system_users_permissions = [];
-    const seed_system_users_events_tracking = [];
-    const seed_system_settings = [];
-    const seed_system_features = [];
-    const seed_system_tags = [];
-    const seed_fpm_persons = [];
-    const seed_fpm_occupations = [];
-    const seed_fpm_persons_occupations = [];
-    const seed_fpm_persons_departments = [];
-    const seed_fpm_departments = [];
-    const seed_ffm_files = [];
-    const seed_fdv_data_visualizers = [];
-    const seed_ftm_tasks = [];
-    const seed_ftm_users_tasks = [];
+    //Uncommend and use if you need to seed more inforation for core tables.
+    //const seed_system_users = await prisma.$transaction([]);
+    //const seed_system_users_roles = await prisma.$transaction([]);
+    //const seed_system_users_extern_integration = await prisma.$transaction([]);
+    //const seed_system_users_extern_integration_tags = await prisma.$transaction([]);
+    //const seed_system_permissions = await prisma.$transaction([]);
+    //const seed_system_roles_permissions = await prisma.$transaction([]);
+    //const seed_system_users_permissions = await prisma.$transaction([]);
+    //const seed_system_users_events_tracking = await prisma.$transaction([]);
+    //const seed_system_settings = await prisma.$transaction([]);
+    //const seed_system_features = await prisma.$transaction([]);
+    //const seed_system_tags = await prisma.$transaction([]);
+    //const seed_fpm_persons = await prisma.$transaction([]);
+    //const seed_fpm_occupations = await prisma.$transaction([]);
+    //const seed_fpm_persons_occupations = await prisma.$transaction([]);
+    //const seed_fpm_persons_departments = await prisma.$transaction([]);
+    //const seed_fpm_departments = await prisma.$transaction([]);
+    //const seed_ffm_files = await prisma.$transaction([]);
+    //const seed_fdv_data_visualizers = await prisma.$transaction([]);
+    //const seed_ftm_tasks = await prisma.$transaction([]);
+    //const seed_ftm_users_tasks = await prisma.$transaction([]);
 
 }
 
