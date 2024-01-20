@@ -22,14 +22,16 @@ model SystemUser {
   user_status_id      Int
   user_status         SystemUserStatus  @relation(fields: [user_status_id], references: [id])
   tasks               UserTask[]
-  roles               SystemUserExternIntegration[]
+  extern_integrations               SystemUserExternIntegration[]
   files               File[]
   persons             Person[]
   data_visualizers    DataVisualizer[]
-  events              SystemEventTracking[]
+  events              SystemUserEventTracking[]
+  permissions         SystemUserPermission[]
+  roles               SystemUserRole[]
   created_at          DateTime          @default(now())
-  updated_at          DateTime          @updatedAt
-  deleted_at          DateTime
+  updated_at          DateTime?          @updatedAt
+  deleted_at          DateTime?
 }
 
 model SystemUserStatus {
@@ -39,8 +41,8 @@ model SystemUserStatus {
   description         String
   user                SystemUser[]
   created_at          DateTime    @default(now())
-  updated_at          DateTime    @updatedAt
-  deleted_at          DateTime
+  updated_at          DateTime?    @updatedAt
+  deleted_at          DateTime?
 }
 //END: USER MANAGEMENT
 
@@ -54,8 +56,8 @@ model SystemUserExternIntegration {
   user                SystemUser  @relation(fields: [user_id], references: [id])
   tag                 SystemUserExternIntegrationTags @relation(fields: [tag_id], references: [id])
   created_at          DateTime    @default(now())
-  updated_at          DateTime    @updatedAt
-  deleted_at          DateTime
+  updated_at          DateTime?    @updatedAt
+  deleted_at          DateTime?
 }
 
 model SystemUserExternIntegrationTags {
@@ -65,8 +67,8 @@ model SystemUserExternIntegrationTags {
   description         String      @db.Text
   user                SystemUserExternIntegration[]
   created_at          DateTime    @default(now())
-  updated_at          DateTime    @updatedAt
-  deleted_at          DateTime
+  updated_at          DateTime?    @updatedAt
+  deleted_at          DateTime?
 }
 //END: SYSTEM EXTERN INTEGRATION MANAGEMENT
 
@@ -78,78 +80,79 @@ model SystemRole {
   name                String
   description         String      @db.Text
   roles               SystemRolePermission[]
+  users_roles         SystemUserRole[]
   created_at          DateTime    @default(now())
-  updated_at          DateTime    @updatedAt
-  deleted_at          DateTime
+  updated_at          DateTime?    @updatedAt
+  deleted_at          DateTime?
 }
 
 model SystemRolePermission {
   @@map("system_roles_permissions")
   id                  Int                   @default(autoincrement()) @id
   role                SystemRole            @relation(fields: [role_id], references: [id])
-  permission          SystemPermissions  @relation(fields: [permission_id], references: [id])
+  permission          SystemPermissions     @relation(fields: [permission_id], references: [id])
   role_id             Int
   permission_id       Int
   created_at          DateTime              @default(now())
-  updated_at          DateTime              @updatedAt
-  deleted_at          DateTime
+  updated_at          DateTime?             @updatedAt
+  deleted_at          DateTime?
 }
 
 model SystemPermissions {
   @@map("system_permissions")
-  id                  Int         @default(autoincrement()) @id
+  id                  Int                     @default(autoincrement()) @id
   roles               SystemRolePermission[]
+  users_permissions   SystemUserPermission[]
   feature             String
   tag                 String
-  read                Boolean
-  write               Boolean
-  edit                Boolean
-  soft_delete         Boolean
-  hard_delete         Boolean
-  admin               Boolean
-  created_at          DateTime    @default(now())
-  updated_at          DateTime    @updatedAt
-  deleted_at          DateTime
+  read                Boolean                 @default(false)
+  write               Boolean                 @default(false)
+  edit                Boolean                 @default(false)
+  soft_delete         Boolean                 @default(false)
+  hard_delete         Boolean                 @default(false)
+  admin               Boolean                 @default(false)
+  created_at          DateTime                @default(now())
+  updated_at          DateTime?               @updatedAt
+  deleted_at          DateTime?
 }
 
 model SystemUserPermission {
   @@map("system_users_permissions")
   id                  Int         @default(autoincrement()) @id
+  user_id             Int
+  permission_id       Int
+  user                SystemUser    @relation(fields: [user_id], references: [id])
+  permission          SystemPermissions     @relation(fields: [permission_id], references: [id])
   created_at          DateTime    @default(now())
-  updated_at          DateTime    @updatedAt
-  deleted_at          DateTime
+  updated_at          DateTime?    @updatedAt
+  deleted_at          DateTime?
 }
 
 model SystemUserRole {
   @@map("system_users_roles")
   id                  Int         @default(autoincrement()) @id
+  user_id             Int
+  role_id             Int
+  user                SystemUser    @relation(fields: [user_id], references: [id])
+  role                SystemRole     @relation(fields: [role_id], references: [id])
   created_at          DateTime    @default(now())
-  updated_at          DateTime    @updatedAt
-  deleted_at          DateTime
+  updated_at          DateTime?    @updatedAt
+  deleted_at          DateTime?
 }
 //END: SYSTEM ROLES AND PERMISSIONS MANAGEMENT
 
 
 //FEATURE: SYSTEM EVENTS TRACKING MANAGEMENT
-model SystemUserTracking {
+model SystemUserEventTracking {
   @@map("system_users_events_tracking")
   id                  Int         @default(autoincrement()) @id
-  created_at          DateTime    @default(now())
-  updated_at          DateTime    @updatedAt
-  deleted_at          DateTime
-}
-
-
-model SystemEventTracking {
-  @@map("system_events_tracking")
-  id                  Int                       @default(autoincrement()) @id
   user_id             Int
-  event_type_id       Int
-  user                SystemUser                @relation(fields: [user_id], references: [id])
-  event               SystemEventTypesTracking  @relation(fields: [event_type_id], references: [id])
-  created_at          DateTime                  @default(now())
-  updated_at          DateTime                  @updatedAt
-  deleted_at          DateTime
+  type_id             Int
+  user                SystemUser  @relation(fields: [user_id], references: [id])
+  type                SystemEventTypesTracking  @relation(fields: [type_id], references: [id])
+  created_at          DateTime    @default(now())
+  updated_at          DateTime?    @updatedAt
+  deleted_at          DateTime?
 }
 
 model SystemEventTypesTracking {
@@ -157,10 +160,10 @@ model SystemEventTypesTracking {
   id                  Int         @default(autoincrement()) @id
   name                String
   description         String      @db.Text
-  events              SystemEventTracking[]
+  users_events        SystemUserEventTracking[]
   created_at          DateTime    @default(now())
-  updated_at          DateTime    @updatedAt
-  deleted_at          DateTime
+  updated_at          DateTime?    @updatedAt
+  deleted_at          DateTime?
 }
 //END: SYSTEM EVENTS TRACKING MANAGEMENT
 
@@ -173,8 +176,8 @@ model SystemSettings {
   flag                Int
   rules_in_json       String      @db.Text
   created_at          DateTime    @default(now())
-  updated_at          DateTime    @updatedAt
-  deleted_at          DateTime
+  updated_at          DateTime?    @updatedAt
+  deleted_at          DateTime?
 }
 
 model SystemFeatures {
@@ -184,8 +187,8 @@ model SystemFeatures {
   description         String      @db.Text
   tags                SystemTags[]
   created_at          DateTime    @default(now())
-  updated_at          DateTime    @updatedAt
-  deleted_at          DateTime
+  updated_at          DateTime?    @updatedAt
+  deleted_at          DateTime?
 }
 
 model SystemTags {
@@ -196,8 +199,8 @@ model SystemTags {
   feature             SystemFeatures    @relation(fields: [feature_id], references: [id])
   feature_id          Int
   created_at          DateTime    @default(now())
-  updated_at          DateTime    @updatedAt
-  deleted_at          DateTime
+  updated_at          DateTime?    @updatedAt
+  deleted_at          DateTime?
 }
 
 
@@ -213,8 +216,8 @@ model Person {
   departments         PersonDepartment[]
   occupations         PersonOccupation[]
   created_at          DateTime              @default(now())
-  updated_at          DateTime              @updatedAt
-  deleted_at          DateTime
+  updated_at          DateTime?              @updatedAt
+  deleted_at          DateTime?
 }
 
 model Occupation {
@@ -222,8 +225,8 @@ model Occupation {
   id                  Int                 @default(autoincrement()) @id
   occupations         PersonOccupation[]  
   created_at          DateTime            @default(now())
-  updated_at          DateTime            @updatedAt
-  deleted_at          DateTime
+  updated_at          DateTime?            @updatedAt
+  deleted_at          DateTime?
 }
 
 model PersonOccupation {
@@ -234,8 +237,8 @@ model PersonOccupation {
   person_id           Int
   occupation_id       Int
   created_at          DateTime    @default(now())
-  updated_at          DateTime    @updatedAt
-  deleted_at          DateTime
+  updated_at          DateTime?    @updatedAt
+  deleted_at          DateTime?
 }
 
 model PersonDepartment {
@@ -246,8 +249,8 @@ model PersonDepartment {
   person_id           Int
   department_id       Int
   created_at          DateTime    @default(now())
-  updated_at          DateTime    @updatedAt
-  deleted_at          DateTime
+  updated_at          DateTime?    @updatedAt
+  deleted_at          DateTime?
 }
 
 model Department {
@@ -257,8 +260,8 @@ model Department {
   description         String      @db.Text
   persons             PersonDepartment[]
   created_at          DateTime    @default(now())
-  updated_at          DateTime    @updatedAt
-  deleted_at          DateTime
+  updated_at          DateTime?    @updatedAt
+  deleted_at          DateTime?
 }
 //END: PEOPLE MANAGEMENT
 
@@ -275,8 +278,8 @@ model File {
   user                SystemUser  @relation(fields: [user_id], references: [id])
   user_id             Int
   created_at          DateTime    @default(now())
-  updated_at          DateTime    @updatedAt
-  deleted_at          DateTime
+  updated_at          DateTime?    @updatedAt
+  deleted_at          DateTime?
 }
 //END: FILE MANAGEMENT
 
@@ -290,8 +293,8 @@ model DataVisualizer {
   user_id             Int
   rules_in_json       String      @db.Text
   created_at          DateTime    @default(now())
-  updated_at          DateTime    @updatedAt
-  deleted_at          DateTime
+  updated_at          DateTime?    @updatedAt
+  deleted_at          DateTime?
 }
 //END: DATA VISUALIZER MANAGEMENT
 
@@ -304,8 +307,8 @@ model Task {
   deadline_at         DateTime
   users               UserTask[]
   created_at          DateTime    @default(now())
-  updated_at          DateTime    @updatedAt
-  deleted_at          DateTime
+  updated_at          DateTime?    @updatedAt
+  deleted_at          DateTime?
 }
 
 model UserTask {
@@ -316,7 +319,7 @@ model UserTask {
   user                SystemUser  @relation(fields: [user_id], references: [id])
   user_id             Int
   created_at          DateTime    @default(now())
-  updated_at          DateTime    @updatedAt
-  deleted_at          DateTime
+  updated_at          DateTime?    @updatedAt
+  deleted_at          DateTime?
 }
 //END: TASK MANAGEMENT
